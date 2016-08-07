@@ -124,3 +124,5 @@ pip-selfcheck.json
 
 /upload_local
 /revision.txt
+*.db
+*.sqlite*
