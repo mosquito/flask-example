@@ -32,9 +32,8 @@ parser.add_argument('--log-level', help='Set logging level', default='info',
                     choices=('critical', 'fatal', 'error', 'warning', 'warn', 'info', 'debug'))
 
 
-def main():
-    options = parser.parse_args()
-    engine = create_engine(options.db, convert_unicode=True)
+def init_db():
+    engine = create_engine(app.config['DATABASE'], convert_unicode=True)
 
     db_session = scoped_session(
         sessionmaker(
@@ -51,16 +50,25 @@ def main():
     def shutdown_session(exception=None):
         db_session.remove()
 
+    app.db = db_session
+
+
+def main():
+    options = parser.parse_args()
+
     logging.basicConfig(
         level=getattr(logging, options.log_level.upper(), logging.INFO),
         format="[%(asctime)s] %(filename)s:%(lineno)d %(levelname)s %(message)s"
     )
 
-    log.info("Starting service on http://%s:%d/", options.listen, options.port)
+    app.config['DATABASE'] = options.db
+
+    init_db()
 
     app.template_folder = TEMPLATES_PATH
     app.static_folder = STATIC_PATH
-    app.db = db_session
+
+    log.info("Starting service on http://%s:%d/", options.listen, options.port)
 
     if options.debug:
         log.warning("Running on debug mode not for production.")
