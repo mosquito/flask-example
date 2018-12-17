@@ -6,7 +6,7 @@ from contextlib import suppress
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from gevent.wsgi import WSGIServer
+from gevent.pywsgi import WSGIServer
 
 from .models import Base
 from .app import app
